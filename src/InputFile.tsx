@@ -1,8 +1,13 @@
-import { useState, ChangeEvent } from 'react'
+import { ChangeEvent, Dispatch, SetStateAction } from 'react'
 
 interface InputFileProps {
   width?: number
   height?: number
+  setImage: Dispatch<SetStateAction<string>>
+}
+
+const test = (data: any) => {
+  data.replace("data:image/png;base64,", "base:")
 }
 
 const convertBase64toImage = (source: string, width: number, height: number, callback: (data: string) => void) => {
@@ -24,11 +29,11 @@ const convertBase64toImage = (source: string, width: number, height: number, cal
   image.src = source
 }
 
-export const ConvertImageToBase64 = (source: Blob, callback: (data: string) => void) => {
+export const convertImageToBase64 = (source: Blob, callback: (data: string) => void) => {
   const reader = new FileReader()
 
   reader.onload = () => {
-    reader.result
+    return reader.result
       ? callback(reader.result.toString())
       : false
   }
@@ -40,24 +45,21 @@ export const ConvertImageToBase64 = (source: Blob, callback: (data: string) => v
   reader.readAsDataURL(source)
 }
 
-export const InputFile = ({ width = 300, height = 200 }: InputFileProps) => {
-  const [image, setImage] = useState<Blob | null>(null)
+export const InputFile = ({ width = 300, height = 200, setImage, ...rest }: InputFileProps) => {
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
-    setImage(e.target.files![0])
-  }
-
-  image !== null
-    ? ConvertImageToBase64(image, (data) => {
+    e.target.files![0] !== null
+    ? convertImageToBase64(e.target.files![0], (data) => {
       convertBase64toImage(data, width, height, (data) => {
-        console.log(data.toString())
+        return setImage(data.toString())
       })
     })
     : false
+  }
 
   return (
     <div>
-      <input type="file" name="file" onChange={handleImage} />
+      <input type="file" value='' name="file" onChange={handleImage} {...rest}/>
     </div>
   )
 }
