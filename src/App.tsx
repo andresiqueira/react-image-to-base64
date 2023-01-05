@@ -1,13 +1,17 @@
-import { useState } from 'react'
 import './App.css'
-import { InputFile } from './InputFile'
+import { useForm } from "react-hook-form";
+import { InputFileRHF ,InputFileProps } from './InputFileRHF';
 
 function App() {
-  const [image, setImage] = useState<string>('')
-  console.log('state', image)
+  const { register, control, handleSubmit, watch, formState: { errors } } = useForm<InputFileProps>();
+  const onSubmit = (data: any) => console.log('hook context data', data);
+
   return (
     <div className="App">
-      <InputFile width={300} height={200} setImage={setImage} />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <InputFileRHF width={300} height={200} control={control} />
+        <button type='submit'>ENVIAR</button>
+      </form>
     </div>
   )
 }
