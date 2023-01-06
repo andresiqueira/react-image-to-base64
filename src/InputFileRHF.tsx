@@ -1,10 +1,6 @@
 import { ChangeEvent } from 'react'
 import { useController, Control } from "react-hook-form";
 
-export interface InputFileProps {
-  image: string
-}
-
 const convertBase64toImage = (source: string, width: number, height: number, callback: (data: string) => void) => {
   const image = new Image(width, height)
 
@@ -40,10 +36,10 @@ export const convertImageToBase64 = (source: Blob, callback: (data: string) => v
   reader.readAsDataURL(source)
 }
 
-export const InputFileRHF = ({ control, width, height }: { control: Control<InputFileProps>, width: number, height: number }) => {
+export const InputFileRHF = ({ control, width, height, name }: { control: Control, width: number, height: number, name: string }) => {
   const { field } = useController({
     control,
-    name: 'image',
+    name: name
   })
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
