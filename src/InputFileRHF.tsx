@@ -36,7 +36,7 @@ export const convertImageToBase64 = (source: Blob, callback: (data: string) => v
   reader.readAsDataURL(source)
 }
 
-export const InputFileRHF = ({ control, width, height, name }: { control: Control, width: number, height: number, name: string }) => {
+export const InputFileRHF = ({ control, width, height, name, ...rest }: { control: Control, width: number, height: number, name: string }) => {
   const { field } = useController({
     control,
     name: name
@@ -46,14 +46,16 @@ export const InputFileRHF = ({ control, width, height, name }: { control: Contro
     e.target.files![0] !== null
       ? convertImageToBase64(e.target.files![0], (data) => {
         convertBase64toImage(data, width, height, (data) => {
-          return field.onChange(data.split(",")[1].toString())
+          field.onChange(data.split(",")[1].toString())
         })
       })
       : false
   }
 
+  
   return (
     <div>
+      <img src={ field.value ? `data:image/jpeg;base64, ${field.value}` : undefined } alt="Preview" />
       <input
         type='file'
         ref={field.ref}
@@ -61,6 +63,7 @@ export const InputFileRHF = ({ control, width, height, name }: { control: Contro
           handleImage(e)
         }}
         onBlur={field.onBlur}
+        {...rest}
       />
     </div>
   )

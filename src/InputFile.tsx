@@ -1,13 +1,10 @@
 import { ChangeEvent, Dispatch, SetStateAction } from 'react'
 
 interface InputFileProps {
+  image: string
   width?: number
   height?: number
   setImage: Dispatch<SetStateAction<string>>
-}
-
-const test = (data: any) => {
-  data.replace("data:image/png;base64,", "base:")
 }
 
 const convertBase64toImage = (source: string, width: number, height: number, callback: (data: string) => void) => {
@@ -45,21 +42,31 @@ export const convertImageToBase64 = (source: Blob, callback: (data: string) => v
   reader.readAsDataURL(source)
 }
 
-export const InputFile = ({ width = 300, height = 200, setImage, ...rest }: InputFileProps) => {
+export const InputFile = ({ width = 300, height = 200, image, setImage, ...rest }: InputFileProps) => {
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
     e.target.files![0] !== null
-    ? convertImageToBase64(e.target.files![0], (data) => {
-      convertBase64toImage(data, width, height, (data) => {
-        return setImage(data.toString())
+      ? convertImageToBase64(e.target.files![0], (data) => {
+        convertBase64toImage(data, width, height, (data) => {
+          setImage((prevState) => data ? JSON.stringify({ base: data.split(",")[1].toString() }) : prevState)
+        })
       })
-    })
-    : false
+      : false
   }
 
   return (
     <div>
-      <input type="file" value='' name="file" onChange={handleImage} {...rest}/>
+      
+      {
+        image &&
+        (
+          JSON.parse(image).base
+            ? (<img src={`data:image/jpeg;base64, ${JSON.parse(image).base}`} alt='' width={150} height={75} style={{ marginRight: "20px" }} />)
+            : (<img src={JSON.parse(image).url} alt='' width={150} height={75} style={{ marginRight: "20px" }} />)
+        )
+      }
+
+      <input type="file" value='' name="file" onChange={handleImage} {...rest} />
     </div>
   )
 }
